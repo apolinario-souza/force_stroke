@@ -1,5 +1,5 @@
 ---
-title: "Controle de Força Isométrica em Pacientes Pós-AVC: Análise Longitudinal da Força Máxima e do Erro de Rastreamento"
+title: "Controle de Força Isométrica em Pacientes Pós-AVC: Análise Longitudinal da Força Máxima e do RMSE"
 lang: pt-BR
 ---
 
@@ -15,9 +15,9 @@ Os dados foram registrados em arquivos TSV sem cabeçalho, com decimal represent
 
 ## Processamento das Tentativas de Controle de Força
 
-Para o cálculo do erro de rastreamento, o sinal de cada tentativa foi submetido a um processo de limpeza antes da extração das métricas. O trecho final de alguns registros apresentava um plateau congelado, onde a força bruta deixava de variar entre amostras consecutivas, indicando que a gravação continuou após o encerramento voluntário da contração. Esse trecho foi identificado e removido automaticamente. Em seguida, os primeiros e últimos 1,0 segundo de cada tentativa foram descartados, eliminando as rampas de início e estabilização da força. O valor de 1,0 s foi adotado após constatar que o corte de 0,5 s era insuficiente para excluir o transiente inicial. Tentativas foram mantidas independentemente de quanto a força produzida se afastou da meta, pois uma análise de sensibilidade mostrou que excluir tentativas com produção muito acima ou abaixo do alvo não alterava os resultados em nível de sessão — o RMSE de sessão é uma média de várias tentativas e a influência de tentativas individuais extremas é diluída. Sessões sem fmax válida registrada foram mantidas na análise do RMSE, pois o erro de rastreamento é expresso nos percentuais gravados no próprio arquivo de tentativa, independentemente de uma medida de fmax da mesma sessão.
+Para o cálculo do RMSE, o sinal de cada tentativa foi submetido a um processo de limpeza antes da extração das métricas. O trecho final de alguns registros apresentava um plateau congelado, onde a força bruta deixava de variar entre amostras consecutivas, indicando que a gravação continuou após o encerramento voluntário da contração. Esse trecho foi identificado e removido automaticamente. Em seguida, os primeiros e últimos 1,0 segundo de cada tentativa foram descartados, eliminando as rampas de início e estabilização da força. O valor de 1,0 s foi adotado após constatar que o corte de 0,5 s era insuficiente para excluir o transiente inicial. Tentativas foram mantidas independentemente de quanto a força produzida se afastou da meta, pois uma análise de sensibilidade mostrou que excluir tentativas com produção muito acima ou abaixo do alvo não alterava os resultados em nível de sessão — o RMSE de sessão é uma média de várias tentativas e a influência de tentativas individuais extremas é diluída. Sessões sem fmax válida registrada foram mantidas na análise do RMSE, pois o RMSE é expresso nos percentuais gravados no próprio arquivo de tentativa, independentemente de uma medida de fmax da mesma sessão.
 
-O erro de rastreamento de cada tentativa foi quantificado pela raiz do erro quadrático médio (RMSE) entre a força-alvo e a força produzida, ambas em percentual da fmax. O RMSE da sessão foi definido como a média aritmética dos RMSEs de todas as tentativas válidas. Foram obtidas 247 combinações participante × movimento × sessão com RMSE calculado.
+O RMSE de cada tentativa foi quantificado pela raiz do erro quadrático médio (RMSE) entre a força-alvo e a força produzida, ambas em percentual da fmax. O RMSE da sessão foi definido como a média aritmética dos RMSEs de todas as tentativas válidas. Foram obtidas 247 combinações participante × movimento × sessão com RMSE calculado.
 
 Nenhum filtro passa-baixa adicional foi aplicado ao sinal de força das tentativas. Essa decisão foi baseada em análise espectral de 12 arquivos representativos, distribuídos entre participantes e movimentos. A densidade espectral de potência não revelou picos em 50 Hz (razão em relação ao piso espectral: 1,5×) nem em 60 Hz (0,5×) — valores compatíveis com ausência de contaminação por ruído de rede elétrica, para os quais razões de 10× ou mais seriam esperadas. A energia acima de 20 Hz, presente em alguns registros (até 13,5% da energia total), exibiu perfil de banda larga sem concentração em frequências específicas, padrão consistente com tremor fisiológico. Como o tremor é uma manifestação real do déficit motor em pacientes pós-AVC e representa parte do erro de controle que o RMSE pretende capturar, sua remoção por filtragem seria metodologicamente inadequada.
 
@@ -50,13 +50,13 @@ Os modelos mistos indicaram tendência de redução da força máxima ao longo d
 | Flexão de ombro      |    −0,312     | 0,321 | −0,97 |   0,410   | [−0,940; +0,317] |
 | Flexão de punho      |    −0,977     | 0,396 | −2,47 |   0,057   | [−1,750; −0,201] |
 
-## Erro de Rastreamento
+## RMSE
 
 A Figura 2 apresenta as trajetórias individuais e a tendência do ΔRMSE ao longo das sessões. Valores abaixo de zero indicam melhora no controle em relação à primeira sessão; valores acima de zero indicam piora.
 
 ![**Figura 2.** Variação do RMSE médio (ΔRMSE, em % fmax) em relação à sessão 1, ao longo das sessões do protocolo, por participante (linhas coloridas) e tendência populacional com intervalo de confiança de 95% (linha preta).](figuras/delta_rmse_sessoes.png)
 
-Os modelos mistos indicaram tendência de aumento do erro de rastreamento ao longo das sessões em todos os movimentos (Tabela 2). Três dos quatro movimentos apresentaram aumento significativo do RMSE ao longo das sessões. Flexão de ombro mostrou o maior coeficiente, com aumento de aproximadamente 4,1 pontos percentuais de fmax por sessão (β = +4,127; EP = 0,802; p < 0,001). Extensão de punho, que em análises anteriores apresentava tendência marginal, tornou-se significativa com a inclusão das sessões sem fmax, com aumento de 3,5 pontos percentuais por sessão (β = +3,517; EP = 1,178; p = 0,018). Extensão de cotovelo manteve tendência significativa de menor magnitude (β = +0,953; EP = 0,322; p = 0,006). Flexão de punho apresentou tendência positiva, porém não significativa (β = +3,228; EP = 1,700; p = 0,093).
+Os modelos mistos indicaram tendência de aumento do RMSE ao longo das sessões em todos os movimentos (Tabela 2). Três dos quatro movimentos apresentaram aumento significativo do RMSE ao longo das sessões. Flexão de ombro mostrou o maior coeficiente, com aumento de aproximadamente 4,1 pontos percentuais de fmax por sessão (β = +4,127; EP = 0,802; p < 0,001). Extensão de punho, que em análises anteriores apresentava tendência marginal, tornou-se significativa com a inclusão das sessões sem fmax, com aumento de 3,5 pontos percentuais por sessão (β = +3,517; EP = 1,178; p = 0,018). Extensão de cotovelo manteve tendência significativa de menor magnitude (β = +0,953; EP = 0,322; p = 0,006). Flexão de punho apresentou tendência positiva, porém não significativa (β = +3,228; EP = 1,700; p = 0,093).
 
 **Tabela 2.** Resultados do modelo linear misto para ΔRMSE (% fmax) em função do número de sessão. β representa a mudança média estimada em pontos percentuais de RMSE por sessão adicional.
 
@@ -67,13 +67,13 @@ Os modelos mistos indicaram tendência de aumento do erro de rastreamento ao lon
 | Flexão de ombro      |   +4,127     | 0,802 | +5,14 | **< 0,001** | [+2,555; +5,699] |
 | Flexão de punho      |   +3,228     | 1,700 | +1,90 |   0,093   | [−0,104; +6,560] |
 
-## Relação entre Força Máxima e Erro de Rastreamento
+## Relação entre Força Máxima e RMSE
 
 A Figura 3 apresenta o diagrama de dispersão entre Δfmax e ΔRMSE por sessão, para cada movimento.
 
 ![**Figura 3.** Relação entre Δfmax (kg) e ΔRMSE (% fmax) por sessão e participante. Cada ponto representa uma sessão; a cor indica o número da sessão; a linha tracejada é o ajuste linear.](figuras/scatter_fmax_rmse.png)
 
-A análise de correlação, calculada apenas para sessões com fmax válida (nas quais o Δfmax pode ser determinado), revelou padrões distintos entre os grupos de movimentos (Tabela 3). Para os movimentos de flexão, a associação entre Δfmax e ΔRMSE foi negativa, forte e altamente significativa: sessões em que o participante apresentou maior força em relação à sua linha de base também tenderam a apresentar menor erro de rastreamento, com coeficientes de −0,624 para flexão de ombro e −0,654 para flexão de punho (p < 0,001 em ambos). Para os movimentos de extensão, a correlação foi próxima de zero e não significativa (r = −0,075 e r = +0,100, respectivamente; p > 0,5), sugerindo que força e controle variam de forma independente nesses movimentos.
+A análise de correlação, calculada apenas para sessões com fmax válida (nas quais o Δfmax pode ser determinado), revelou padrões distintos entre os grupos de movimentos (Tabela 3). Para os movimentos de flexão, a associação entre Δfmax e ΔRMSE foi negativa, forte e altamente significativa: sessões em que o participante apresentou maior força em relação à sua linha de base também tenderam a apresentar menor RMSE, com coeficientes de −0,624 para flexão de ombro e −0,654 para flexão de punho (p < 0,001 em ambos). Para os movimentos de extensão, a correlação foi próxima de zero e não significativa (r = −0,075 e r = +0,100, respectivamente; p > 0,5), sugerindo que força e controle variam de forma independente nesses movimentos.
 
 **Tabela 3.** Correlação de Pearson (r) entre Δfmax e ΔRMSE por movimento, com intervalo de confiança de 95% pela transformação de Fisher.
 
@@ -105,7 +105,7 @@ Para a força máxima, nenhum movimento apresentou correlação significativa en
 | Flexão de ombro      |  10 | +0,529  |  0,116  | [−0,150; +0,869] |
 | Flexão de punho      |  10 | −0,150  |  0,680  | [−0,712; +0,530] |
 
-Para o erro de rastreamento, o padrão foi distinto: a flexão de ombro apresentou correlação negativa forte e significativa entre número de sessões e ΔRMSE final (r = −0,80; p = 0,005; IC 95%: [−0,951; −0,343]), indicando que participantes que frequentaram mais sessões apresentaram maior melhora no controle motor desse movimento ao final do protocolo (Tabela 5). Para os demais movimentos, as correlações foram próximas de zero e não significativas.
+Para o RMSE, o padrão foi distinto: a flexão de ombro apresentou correlação negativa forte e significativa entre número de sessões e ΔRMSE final (r = −0,80; p = 0,005; IC 95%: [−0,951; −0,343]), indicando que participantes que frequentaram mais sessões apresentaram maior melhora no controle motor desse movimento ao final do protocolo (Tabela 5). Para os demais movimentos, as correlações foram próximas de zero e não significativas.
 
 **Tabela 5.** Correlação de Pearson entre o número total de sessões e o ΔRMSE na última sessão, por movimento.
 

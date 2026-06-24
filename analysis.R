@@ -611,8 +611,96 @@ write_csv(rmse_sessao,    "rmse_sessao.csv")
 write_csv(tabela_modelos, "resultados_modelos.csv")
 write_csv(tab_sessoes,    "qualidade_sessoes.csv")
 
+# =============================================================================
+# ETAPA 7 — DOSE-RESPOSTA: QUANTIDADE DE SESSÕES × GANHO/PERDA TOTAL
+# =============================================================================
+# Por participante × movimento: total de sessões frequentadas e mudança
+# da primeira à última sessão. Permite comparar participantes com mais vs.
+# menos exposição ao protocolo.
+
+dose_fmax <- fmax_sessao %>%
+  group_by(participante, movimento) %>%
+  summarise(
+    n_sessoes   = max(sessao_num),
+    delta_final = delta_fmax_kg[sessao_num == max(sessao_num)],
+    .groups     = "drop"
+  )
+
+dose_rmse <- rmse_sessao %>%
+  group_by(participante, movimento) %>%
+  summarise(
+    n_sessoes   = max(sessao_num),
+    delta_final = delta_rmse[sessao_num == max(sessao_num)],
+    .groups     = "drop"
+  )
+
+cor_dose <- function(df, varname) {
+  df %>%
+    group_by(movimento) %>%
+    summarise(
+      n       = n(),
+      r       = cor(n_sessoes, delta_final, use = "complete.obs"),
+      p_value = tryCatch(
+        cor.test(n_sessoes, delta_final)$p.value,
+        error = function(e) NA_real_
+      ),
+      .groups = "drop"
+    ) %>%
+    mutate(
+      variavel = varname,
+      ic_inf   = tanh(atanh(r) - 1.96 / sqrt(n - 3)),
+      ic_sup   = tanh(atanh(r) + 1.96 / sqrt(n - 3))
+    )
+}
+
+cor_dose_fmax <- cor_dose(dose_fmax, "delta_fmax_kg")
+cor_dose_rmse <- cor_dose(dose_rmse, "delta_rmse")
+
+message("\n=== CORRELAÇÃO n_sessoes × Δfmax (última sessão) ===")
+print(cor_dose_fmax)
+message("\n=== CORRELAÇÃO n_sessoes × ΔRMSE (última sessão) ===")
+print(cor_dose_rmse)
+
+write_csv(bind_rows(cor_dose_fmax, cor_dose_rmse), "correlacao_dose_resposta.csv")
+
+p_dose_fmax <- ggplot(dose_fmax, aes(x = n_sessoes, y = delta_final)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_smooth(method = "lm", se = TRUE, color = "steelblue") +
+  geom_point(size = 3, alpha = 0.8) +
+  geom_text(aes(label = participante), vjust = -0.7, size = 3) +
+  facet_wrap(~ movimento, labeller = labeller(movimento = mov_labels), scales = "free_y") +
+  labs(
+    title    = "Dose-resposta: sessões × ganho em fmax",
+    subtitle = "Cada ponto = um participante; linha = regressão linear com IC 95%",
+    x        = "Número total de sessões",
+    y        = "Δ fmax na última sessão (kg)"
+  ) +
+  theme_bw(base_size = 12)
+
+ggsave("figuras/dose_fmax.png", p_dose_fmax, width = 10, height = 7, dpi = 150)
+message("Figura salva: figuras/dose_fmax.png")
+
+p_dose_rmse <- ggplot(dose_rmse, aes(x = n_sessoes, y = delta_final)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_smooth(method = "lm", se = TRUE, color = "tomato") +
+  geom_point(size = 3, alpha = 0.8) +
+  geom_text(aes(label = participante), vjust = -0.7, size = 3) +
+  facet_wrap(~ movimento, labeller = labeller(movimento = mov_labels), scales = "free_y") +
+  labs(
+    title    = "Dose-resposta: sessões × ganho em RMSE",
+    subtitle = "Cada ponto = um participante; abaixo de zero = melhora no controle",
+    x        = "Número total de sessões",
+    y        = "Δ RMSE na última sessão (% fmax)"
+  ) +
+  theme_bw(base_size = 12)
+
+ggsave("figuras/dose_rmse.png", p_dose_rmse, width = 10, height = 7, dpi = 150)
+message("Figura salva: figuras/dose_rmse.png")
+
 message("\nAnálise concluída. Arquivos gerados:")
 message("  fmax_sessao.csv, rmse_sessao.csv, resultados_modelos.csv, qualidade_sessoes.csv")
+message("  correlacao_dose_resposta.csv")
 message("  figuras/fmax_sessoes.png, figuras/delta_fmax_sessoes.png, figuras/rmse_sessoes.png")
 message("  figuras/fmax_tercio.png, figuras/rmse_tercio.png")
 message("  figuras/scatter_fmax_rmse.png")
+message("  figuras/dose_fmax.png, figuras/dose_rmse.png")

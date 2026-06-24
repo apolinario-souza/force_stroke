@@ -11,7 +11,7 @@ Dez participantes com histórico de acidente vascular cerebral (IDs: 1, 3, 5, 6,
 
 ## Processamento dos Sinais de Força Máxima
 
-Os dados foram registrados em arquivos TSV sem cabeçalho, com decimal representado por vírgula. A escala do equipamento cobria de 0 a 1024 unidades ADC, correspondendo a uma faixa de 0 a 20 kg, com fator de conversão de 0,0195 kg por unidade. O primeiro registro de cada arquivo apresentava sistematicamente um valor espúrio de inicialização do hardware, sendo descartado antes de qualquer processamento. O sinal de força bruta foi suavizado por uma média deslizante de 200 ms (40 amostras a 200 Hz), eliminando picos instantâneos de ruído e permitindo identificar o pico de força sustentada — definido como o máximo do sinal suavizado. Arquivos em que esse pico era inferior a 80 unidades ADC foram descartados, por corresponderem a registros onde o participante não realizou contração efetiva. Esse limiar foi determinado empiricamente a partir da distribuição dos picos em todos os 298 arquivos de fmax, que revelou uma lacuna natural entre valores de ruído, com máximo de até 47 ADC, e contrações reais, com mínimo de 81 ADC. Quando havia mais de uma tentativa de fmax em uma mesma sessão, foi retida aquela com o maior pico suavizado. Arquivos com um prefixo específico nos nomes indicavam avaliações do membro contralateral ou condições preliminares, com força tipicamente cinco vezes menor, e foram excluídos da análise. Após esses procedimentos, foram obtidas 222 combinações participante × movimento × sessão com fmax válida.
+Os dados foram registrados em arquivos TSV sem cabeçalho, com decimal representado por vírgula, a uma frequência de amostragem de 200 Hz. A escala do equipamento cobria de 0 a 1024 unidades ADC, correspondendo a uma faixa de 0 a 20 kg, com fator de conversão de 0,0195 kg por unidade. O primeiro registro de cada arquivo apresentava sistematicamente um valor espúrio de inicialização do hardware, sendo descartado antes de qualquer processamento. O sinal de força bruta foi suavizado por uma média deslizante de 200 ms (40 amostras a 200 Hz), eliminando picos instantâneos de ruído e permitindo identificar o pico de força sustentada — definido como o máximo do sinal suavizado. Arquivos em que esse pico era inferior a 80 unidades ADC foram descartados, por corresponderem a registros onde o participante não realizou contração efetiva. Esse limiar foi determinado empiricamente a partir da distribuição dos picos em todos os 298 arquivos de fmax, que revelou uma lacuna natural entre valores de ruído, com máximo de até 47 ADC, e contrações reais, com mínimo de 81 ADC. Quando havia mais de uma tentativa de fmax em uma mesma sessão, foi retida aquela com o maior pico suavizado. Arquivos com um prefixo específico nos nomes indicavam avaliações do membro contralateral ou condições preliminares, com força tipicamente cinco vezes menor, e foram excluídos da análise. Após esses procedimentos, foram obtidas 222 combinações participante × movimento × sessão com fmax válida.
 
 ## Processamento das Tentativas de Controle de Força
 
@@ -19,11 +19,15 @@ Para o cálculo do erro de rastreamento, o sinal de cada tentativa foi submetido
 
 O erro de rastreamento de cada tentativa foi quantificado pela raiz do erro quadrático médio (RMSE) entre a força-alvo e a força produzida, ambas em percentual da fmax. O RMSE da sessão foi definido como a média aritmética dos RMSEs de todas as tentativas válidas. Foram obtidas 247 combinações participante × movimento × sessão com RMSE calculado.
 
+Nenhum filtro passa-baixa adicional foi aplicado ao sinal de força das tentativas. Essa decisão foi baseada em análise espectral de 12 arquivos representativos, distribuídos entre participantes e movimentos. A densidade espectral de potência não revelou picos em 50 Hz (razão em relação ao piso espectral: 1,5×) nem em 60 Hz (0,5×) — valores compatíveis com ausência de contaminação por ruído de rede elétrica, para os quais razões de 10× ou mais seriam esperadas. A energia acima de 20 Hz, presente em alguns registros (até 13,5% da energia total), exibiu perfil de banda larga sem concentração em frequências específicas, padrão consistente com tremor fisiológico. Como o tremor é uma manifestação real do déficit motor em pacientes pós-AVC e representa parte do erro de controle que o RMSE pretende capturar, sua remoção por filtragem seria metodologicamente inadequada.
+
 ## Normalização pela Linha de Base e Análise Estatística
 
 Para remover a heterogeneidade de baseline entre participantes — que apresentavam forças máximas muito distintas entre si —, ambas as variáveis foram expressas como diferença em relação ao valor da primeira sessão de cada participante em cada movimento, resultando em Δfmax (kg) e ΔRMSE (% fmax). Por construção, esses deltas são zero na sessão 1, que foi excluída dos modelos estatísticos.
 
 A tendência temporal foi estimada por modelos lineares mistos, ajustados separadamente para cada movimento, com o número de sessão como preditor fixo e efeitos aleatórios de intercepto e inclinação por participante, permitindo trajetórias individuais distintas. Quando o modelo com slope aleatório resultava em ajuste singular, utilizou-se apenas intercepto aleatório. A relação entre Δfmax e ΔRMSE foi quantificada pela correlação de Pearson por movimento, com intervalo de confiança de 95% obtido pela transformação de Fisher.
+
+Para investigar uma relação dose-resposta entre exposição ao protocolo e desfechos, calculou-se, por participante e movimento, o total de sessões frequentadas e o valor de Δfmax e ΔRMSE registrado na última sessão disponível — representando a mudança acumulada do início ao fim da participação. A associação entre o número total de sessões e esses deltas finais foi estimada pela correlação de Pearson, também com IC 95% pela transformação de Fisher. Esse nível de análise é entre participantes, complementando os modelos intraindividuais descritos acima.
 
 ---
 
@@ -81,3 +85,35 @@ A análise de correlação, calculada apenas para sessões com fmax válida (nas
 | Flexão de punho      |  50 | **−0,654** | **< 0,001** | [−0,789; −0,459] |
 
 Esses achados evidenciam um padrão aparentemente paradoxal: enquanto os modelos longitudinais indicam aumento do erro e redução da força ao longo do tempo, a correlação por sessão revela que maior força está associada a melhor controle. Esse contraste sugere que a relação biológica entre capacidade de força e precisão no controle motor é real e clinicamente relevante, mas que outros fatores — possivelmente relacionados à progressão da condição neurológica, à fadiga acumulada ao longo do protocolo ou à heterogeneidade na participação entre os indivíduos — impõem uma tendência de deterioração em ambas as variáveis ao longo das semanas de avaliação.
+
+## Dose-Resposta: Quantidade de Sessões e Desfecho Final
+
+A Figura 4 e a Figura 5 apresentam, para cada participante e movimento, a relação entre o número total de sessões frequentadas e a mudança acumulada em fmax e RMSE (da primeira à última sessão).
+
+![**Figura 4.** Relação entre o número total de sessões frequentadas e o Δfmax na última sessão (kg). Cada ponto representa um participante; a linha indica o ajuste linear com IC 95%.](figuras/dose_fmax.png)
+
+![**Figura 5.** Relação entre o número total de sessões frequentadas e o ΔRMSE na última sessão (% fmax). Valores negativos indicam melhora no controle em relação à primeira sessão.](figuras/dose_rmse.png)
+
+Para a força máxima, nenhum movimento apresentou correlação significativa entre o número de sessões e o ganho ou perda de fmax ao final do protocolo (Tabela 4). Os coeficientes variaram de −0,41 a +0,53, todos com p > 0,10, indicando que a quantidade de sessões frequentadas não prediz o desfecho final de força máxima.
+
+**Tabela 4.** Correlação de Pearson entre o número total de sessões e o Δfmax na última sessão, por movimento.
+
+| Movimento            |  n  |    r    |    p    | IC 95%           |
+|----------------------|:---:|:-------:|:-------:|------------------|
+| Extensão de cotovelo |  10 | −0,412  |  0,237  | [−0,827; +0,294] |
+| Extensão de punho    |  10 | +0,130  |  0,721  | [−0,544; +0,702] |
+| Flexão de ombro      |  10 | +0,529  |  0,116  | [−0,150; +0,869] |
+| Flexão de punho      |  10 | −0,150  |  0,680  | [−0,712; +0,530] |
+
+Para o erro de rastreamento, o padrão foi distinto: a flexão de ombro apresentou correlação negativa forte e significativa entre número de sessões e ΔRMSE final (r = −0,80; p = 0,005; IC 95%: [−0,951; −0,343]), indicando que participantes que frequentaram mais sessões apresentaram maior melhora no controle motor desse movimento ao final do protocolo (Tabela 5). Para os demais movimentos, as correlações foram próximas de zero e não significativas.
+
+**Tabela 5.** Correlação de Pearson entre o número total de sessões e o ΔRMSE na última sessão, por movimento.
+
+| Movimento            |  n  |    r    |      p      | IC 95%           |
+|----------------------|:---:|:-------:|:-----------:|------------------|
+| Extensão de cotovelo |  10 | +0,197  |    0,585    | [−0,494; +0,736] |
+| Extensão de punho    |  10 | +0,043  |    0,907    | [−0,603; +0,655] |
+| Flexão de ombro      |  10 | **−0,800** | **0,005** | [−0,951; −0,343] |
+| Flexão de punho      |  10 | +0,195  |    0,589    | [−0,495; +0,735] |
+
+O resultado para flexão de ombro é notável por contrastar com a tendência longitudinal de piora do RMSE descrita anteriormente: embora o grupo como um todo tenha apresentado aumento do erro ao longo das sessões, participantes com maior exposição ao protocolo acumularam desfechos finais relativamente melhores. Isso sugere que a frequência de participação pode modular o efeito do protocolo sobre o controle motor do ombro, ainda que esse efeito não se generalize aos demais movimentos.
